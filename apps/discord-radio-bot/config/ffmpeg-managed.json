@@ -1,0 +1,12 @@
+{
+  "provider": "BtbN",
+  "version": "8.0.1-48-g0592be14ff",
+  "releaseTag": "autobuild-2026-01-31-12-57",
+  "variant": "win64-lgpl-shared-8.0",
+  "assetName": "ffmpeg-n8.0.1-48-g0592be14ff-win64-lgpl-shared-8.0.zip",
+  "assetUrl": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-01-31-12-57/ffmpeg-n8.0.1-48-g0592be14ff-win64-lgpl-shared-8.0.zip",
+  "checksumUrl": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-01-31-12-57/checksums.sha256",
+  "sha256": "c342db971175d1cdb8101e31b265019a52c75abb361e91dcb1ce757cc8a2827e",
+  "relativeExecutablePath": "ffmpeg-n8.0.1-48-g0592be14ff-win64-lgpl-shared-8.0/bin/ffmpeg.exe",
+  "license": "LGPLv2.1-or-later"
+}

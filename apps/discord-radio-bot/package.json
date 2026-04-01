@@ -1,0 +1,43 @@
+{
+  "name": "pear-desktop-discord-radio",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.26.2",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "bootstrap:ffmpeg": "node scripts/bootstrap-ffmpeg.mjs",
+    "dev": "tsx watch src/cli/runtime.ts",
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "predoctor": "tsc -p tsconfig.json",
+    "doctor": "node dist/src/cli/doctor.js",
+    "prelaunch": "tsc -p tsconfig.json",
+    "launch": "node dist/src/cli/launch.js",
+    "preruntime": "tsc -p tsconfig.json",
+    "runtime": "node dist/src/cli/runtime.js",
+    "start": "node dist/src/cli/runtime.js",
+    "prestart": "tsc -p tsconfig.json",
+    "presync-commands": "tsc -p tsconfig.json",
+    "sync-commands": "node dist/src/cli/sync-commands.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "pretest": "tsc -p tsconfig.json",
+    "test": "node --test \"dist/tests/**/*.test.js\""
+  },
+  "dependencies": {
+    "@discordjs/voice": "^0.19.2",
+    "discord.js": "^14.25.1",
+    "pino": "^10.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.12.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.2",
+    "@typescript-eslint/parser": "^8.57.2",
+    "eslint": "^10.1.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
