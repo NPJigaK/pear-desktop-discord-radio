@@ -1,0 +1,5 @@
+Root must expose:
+- pnpm start:radio-stack
+- pnpm doctor:radio-bot
+- pnpm test:radio-bot
+These commands delegate to apps/discord-radio-bot while using the root Pear app as the launch target.

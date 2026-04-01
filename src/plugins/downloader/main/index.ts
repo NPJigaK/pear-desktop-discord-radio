@@ -10,6 +10,7 @@ import {
   YTNodes,
   Platform,
 } from '\u0079\u006f\u0075\u0074\u0075\u0062\u0065i.js';
+import type { Types } from '\u0079\u006f\u0075\u0074\u0075\u0062\u0065i.js';
 import is from 'electron-is';
 import filenamify from 'filenamify';
 import { Mutex } from 'async-mutex';
@@ -46,7 +47,6 @@ import type {
   TrackInfo,
   Playlist,
 } from 'node_modules/\u0079\u006f\u0075\u0074\u0075\u0062\u0065i.js/dist/src/parser/ytmusic';
-
 type CustomSongInfo = SongInfo & { trackId?: string };
 
 const ffmpeg = lazy(async () =>
@@ -58,7 +58,10 @@ const ffmpeg = lazy(async () =>
 );
 const ffmpegMutex = new Mutex();
 
-Platform.shim.eval = async (data: Types.BuildScriptResult, env: Record<string, Types.VMPrimative>) => {
+Platform.shim.eval = async (
+  data: Types.BuildScriptResult,
+  env: Record<string, Types.VMPrimative>,
+) => {
   const properties = [];
 
   if(env.n) {

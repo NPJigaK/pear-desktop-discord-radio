@@ -1,326 +1,295 @@
-<div align="center" markdown="1">
-   <sup>Special thanks to:</sup>
-   <br>
-   <br>
-   <a href="https://go.warp.dev/pear-desktop">
-      <img alt="Warp sponsorship" width="400" src="https://github.com/user-attachments/assets/8307ea56-e872-494a-8a9c-de0e296a06ed" />
-   </a>
+# pear-desktop-discord-radio
 
-### [Warp, built for coding with multiple AI agents](https://go.warp.dev/pear-desktop)
-[Available for macOS, Linux, & Windows](https://go.warp.dev/pear-desktop)<br>
+Windows-only local Discord radio bot that uses Pear Desktop as the playback, search, and queue authority.
 
-</div>
-<hr>
+Japanese README: [README.ja.md](./README.ja.md)
 
-<div align="center">
+> The supported v2 path is a single-repo layout: the patched Pear fork lives at the repo root, and the Node bot/runtime package lives under `apps/discord-radio-bot`.
 
-# :pear: Pear Desktop
+## Topology
 
-[![GitHub release](https://img.shields.io/github/release/pear-devs/pear-desktop.svg?style=for-the-badge)](https://github.com/pear-devs/pear-desktop/releases/)
-[![GitHub license](https://img.shields.io/github/license/pear-devs/pear-desktop.svg?style=for-the-badge)](https://github.com/pear-devs/pear-desktop/blob/master/license)
-[![eslint code style](https://img.shields.io/badge/code_style-eslint-5ed9c7.svg?style=for-the-badge)](https://github.com/pear-devs/pear-desktop/blob/master/eslint.config.mjs)
-[![Build status](https://img.shields.io/github/actions/workflow/status/pear-devs/pear-desktop/build.yml?branch=master&style=for-the-badge)](https://GitHub.com/pear-devs/pear-desktop/releases/)
-[![GitHub All Releases](https://img.shields.io/github/downloads/pear-devs/pear-desktop/total?style=for-the-badge)](https://GitHub.com/pear-devs/pear-desktop/releases/)
-<!--[![AUR](https://img.shields.io/aur/version/pear-desktop-bin?color=blueviolet&style=for-the-badge)](https://aur.archlinux.org/packages/pear-desktop-bin)-->
-[![Known Vulnerabilities](https://snyk.io/test/github/pear-devs/pear-desktop/badge.svg)](https://snyk.io/test/github/pear-devs/pear-desktop)
+- Repo root: patched Pear Desktop fork, including the `direct-audio-export` plugin and Pear build/start scripts.
+- `apps/discord-radio-bot`: Discord runtime, `doctor`, launcher, FFmpeg bootstrap, slash-command sync, and tests.
+- Root wrapper entry points:
+  - `pnpm start:radio-stack`
+  - `pnpm doctor:radio-bot`
+  - `pnpm test:radio-bot`
+- No external sibling Pear repository is part of the supported topology.
 
-</div>
+## Product Boundaries
 
-<!--![Screenshot](web/screenshot.png "Screenshot")-->
+- One guild, one controller user, one active voice session.
+- One root slash command: `/radio`.
+- Guild-scoped command sync only.
+- Pear remains the only source of truth for playback state, search results, and queue state.
+- No cloud hosting, no public interactions endpoint, and no database.
 
-- Native look & feel extension
+## Requirements
 
-> [!IMPORTANT]
-> ⚠️ Disclaimer
->
-> **No Affiliation**
->
-> This project, and its contributors, are not affiliated with, authorized by, endorsed by, or in any way officially connected with Google LLC, YouTube, or any of their subsidiaries or affiliates. **This is an independent, non-profit, and unofficial extension developed by a team of volunteers with the goal of providing a desktop experience.**
->
-> **Trademarks**
->
-> The names "Google" and "YouTube Music", as well as related names, marks, emblems, and images, are registered trademarks of their respective owners. Any use of these trademarks is for identification and reference purposes only and does not imply any association with the trademark holder. We have no intention of infringing upon these trademarks or causing harm to the trademark holders.
->
-> **Limitation of Liability**
->
-> This application (extension) is provided "AS IS", and you use it at your own risk. In no event shall the developers or contributors be liable for any claim, damages, or other liability, including any legal consequences, arising from, out of, or in connection with the software or the use or other dealings in the software. The responsibility for any and all outcomes of using this software rests entirely with the user.
+- Native Windows 11 for runtime use.
+- Node.js 24 or newer.
+- Discord application and bot token for the target guild.
+- The patched Pear fork already present at this repo root.
 
-## Content
+`FFMPEG_DSHOW_AUDIO_DEVICE` is not part of the supported v2 setup path.
 
-- [Features](#features)
-- [Translation](#translation)
-- [Download](#download)
-  - [Arch Linux](#arch-linux)
-  - [Solus](#solus)
-  - [MacOS](#macos)
-  - [Windows](#windows)
-    - [How to install without a network connection? (in Windows)](#how-to-install-without-a-network-connection-in-windows)
-- [Themes](#themes)
-- [Dev](#dev)
-- [Build your own plugins](#build-your-own-plugins)
-  - [Creating a plugin](#creating-a-plugin)
-  - [Common use cases](#common-use-cases)
-- [Build](#build)
-- [Production Preview](#production-preview)
-- [Tests](#tests)
-- [License](#license)
-- [FAQ](#faq)
+## Quick Start
 
-## Translation
+Use this if you just want the shortest working path.
 
-You can help with translation on [Hosted Weblate](https://bit.ly/48n5YF7).
+1. Create `E:\github\pear-desktop-discord-radio\.env` from [apps/discord-radio-bot/.env.example](./apps/discord-radio-bot/.env.example).
+2. Copy the same file to `E:\github\pear-desktop-discord-radio\apps\discord-radio-bot\.env`.
+3. From the repo root, run:
 
-<a href="https://bit.ly/48n5YF7">
-  <img src="https://bit.ly/4q83L6S" alt="translation status" />
-  <img src="https://bit.ly/4h3zBxo" alt="translation status 2" />
-</a>
-
-## Download
-
-You can check out the [latest release](https://github.com/pear-devs/pear-desktop/releases/latest) to quickly find the
-latest version.
-
-### Arch Linux
-
-Install the [`pear-desktop`](https://aur.archlinux.org/packages/pear-desktop) package from the AUR. For AUR installation instructions, take a look at
-this [wiki page](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_packages).
-
-### [Solus](https://getsol.us/)
-
-```bash
-sudo eopkg install pear-desktop
+```powershell
+pnpm install
+pnpm build
+pnpm --dir apps/discord-radio-bot run bootstrap:ffmpeg
 ```
 
-### macOS
+4. Start Pear from the repo root:
 
-You can install the app using Homebrew (see the [cask definition](https://github.com/pear-devs/homebrew-pear)):
-
-```bash
-brew install pear-devs/pear/pear-desktop
+```powershell
+pnpm start:direct-audio-export
 ```
 
-If you install the app manually and get an error "is damaged and can’t be opened." when launching the app, run the following in the Terminal:
+5. In Pear, enable:
+   - API Server
+   - `127.0.0.1`
+   - `AUTH_AT_FIRST`
+   - `Direct Audio Export (Spike)`
+6. Back in the repo root, run:
 
-```bash
-/usr/bin/xattr -cr /Applications/Pear\ Desktop.app
+```powershell
+pnpm doctor:radio-bot
+pnpm --dir apps/discord-radio-bot run sync-commands
 ```
 
-### Windows
+7. Start the bot:
 
-You can use the [Scoop package manager](https://scoop.sh) to install the `pear-desktop` package from
-the [`extras` bucket](https://github.com/ScoopInstaller/Extras).
+- If Pear is still open from step 4, run:
 
-```bash
-scoop bucket add extras
-scoop install extras/pear-desktop
+```powershell
+pnpm --dir apps/discord-radio-bot run runtime
 ```
 
-Alternately you can use [Winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/), Windows 11s
-official CLI package manager to install the `pear-devs.pear-desktop` package.
+- If Pear is not running, run the integrated launcher:
 
-*Note: Microsoft Defender SmartScreen might block the installation since it is from an "unknown publisher". This is also
-true for the manual installation when trying to run the executable(.exe) after a manual download here on github (same
-file).*
-
-```bash
-winget install pear-devs.pear-desktop
+```powershell
+pnpm start:radio-stack
 ```
 
-#### How to install without a network connection? (in Windows)
+8. In Discord, join a normal voice channel and run `/radio join`.
 
-- Download the `*.nsis.7z` file for _your device architecture_ in [release page](https://github.com/pear-devs/pear-desktop/releases/latest).
-  - `x64` for 64-bit Windows
-  - `ia32` for 32-bit Windows
-  - `arm64` for ARM64 Windows
-- Download installer in release page. (`*-Setup.exe`)
-- Place them in the **same directory**.
-- Run the installer.
+If `pnpm doctor:radio-bot` prints `full-pass: YES`, the stack is ready.
 
-## Themes
+## Pear Setup
 
-You can load CSS files to change the look of the application (Options > Visual Tweaks > Themes).
+In the Pear app built from this repo root:
 
-Some predefined themes are available in https://github.com/kerichdev/themes-for-ytmdesktop-player.
+1. Enable the API Server.
+2. Bind it to `127.0.0.1`.
+3. Keep auth mode on `AUTH_AT_FIRST`.
+4. Enable the `Direct Audio Export (Spike)` plugin used by the v2 runtime path.
 
-## Dev
+Supported audio path:
 
-```bash
-git clone https://github.com/pear-devs/pear-desktop
-cd pear-desktop
-pnpm install --frozen-lockfile
+`Pear direct audio export -> FFmpeg encode -> Ogg/Opus -> Discord voice`
+
+## Environment
+
+Use [apps/discord-radio-bot/.env.example](./apps/discord-radio-bot/.env.example) as the variable reference.
+
+Env loading depends on how you start the bot package:
+
+- Root wrapper commands such as `pnpm start:radio-stack`, `pnpm doctor:radio-bot`, and `pnpm test:radio-bot` use the repo-root `.env` as a fallback source for the bot package.
+- Direct bot-package commands such as `pnpm --dir apps/discord-radio-bot run sync-commands` and `pnpm --dir apps/discord-radio-bot run runtime` do not get that root-wrapper fallback automatically. For those commands, either export the variables in the current shell first or place a matching `.env` in `apps/discord-radio-bot/`.
+
+Required:
+
+- `DISCORD_TOKEN`
+- `DISCORD_APPLICATION_ID`
+- `DISCORD_GUILD_ID`
+- `DISCORD_CONTROLLER_USER_ID`
+- `PEAR_CLIENT_ID`
+
+Optional:
+
+- `PEAR_HOST` default: `127.0.0.1`
+- `PEAR_PORT` default: `26538`
+- `PEAR_DESKTOP_DIR` override only; defaults to this repo root
+- `FFMPEG_PATH` fallback only
+- `LOG_LEVEL`
+
+`PEAR_HOST` is locked to `127.0.0.1`. Startup fails if it is anything else.
+
+## Install
+
+Install the integrated workspace from the repo root:
+
+```powershell
+pnpm install
+pnpm build
+pnpm --dir apps/discord-radio-bot run bootstrap:ffmpeg
+```
+
+- `pnpm install` installs both the Pear root and the bot workspace package.
+- `pnpm build` builds the Pear app at the root.
+- `pnpm --dir apps/discord-radio-bot run bootstrap:ffmpeg` downloads the pinned BtbN `win64-lgpl-shared-8.0` build, verifies its checksum, and extracts it into `apps/discord-radio-bot/.cache/ffmpeg/`.
+
+FFmpeg provenance and attribution are documented in [docs/ffmpeg-notice.md](./docs/ffmpeg-notice.md).
+
+If runtime or `doctor` reports that no usable ffmpeg executable was found, run the bot-package bootstrap command first. Fallback to `FFMPEG_PATH` and `PATH` still remains available.
+
+FFmpeg resolution order:
+
+1. app-managed bot-package cache
+2. `FFMPEG_PATH`
+3. `PATH`
+
+## Command Sync
+
+Normal runtime startup never registers commands. Sync them explicitly from the bot package:
+
+```powershell
+pnpm --dir apps/discord-radio-bot run sync-commands
+```
+
+Before running that direct bot-package command, make sure the environment is available either through shell-exported variables or `apps/discord-radio-bot/.env`.
+
+This registers one guild-scoped `/radio` command tree for the configured guild.
+
+## Diagnostics
+
+Run the standalone doctor through the root wrapper:
+
+```powershell
+pnpm doctor:radio-bot
+```
+
+Doctor checks:
+
+- Pear host is exactly `127.0.0.1`
+- Pear auth endpoint is reachable
+- Pear websocket endpoint is reachable
+- The plugin export transport is discoverable
+- The export PCM contract is ready for runtime
+- FFmpeg is discoverable with explicit source/path reporting
+- FFmpeg can satisfy the export -> Ogg/Opus encode smoke test used by runtime
+
+Each check reports `PASS`, `FAIL`, or `UNSUPPORTED`. `full-pass: YES` only appears on native Windows 11 with every required check passing.
+
+## Run
+
+Pear dev/build commands stay at the repo root:
+
+```powershell
 pnpm dev
-```
-
-Instead of installing pnpm on your system, you can also use [devcontainers](https://containers.dev/). You can use devcontainers either as a development environment in VS Code, or as a way to easily build the project without installing dependencies on your host system.
-
-Note that this has it's own limitations (for example, GUI doesn't work on, at least some, Linux hosts).
-
-## Build your own plugins
-
-Using plugins, you can:
-
-- manipulate the app - the `BrowserWindow` from electron is passed to the plugin handler
-- change the front by manipulating the HTML/CSS
-
-### Creating a plugin
-
-Create a folder in `src/plugins/YOUR-PLUGIN-NAME`:
-
-- `index.ts`: the main file of the plugin
-```typescript
-import style from './style.css?inline'; // import style as inline
-
-import { createPlugin } from '@/utils';
-
-export default createPlugin({
-  name: 'Plugin Label',
-  restartNeeded: true, // if value is true, ytmusic show restart dialog
-  config: {
-    enabled: false,
-  }, // your custom config
-  stylesheets: [style], // your custom style,
-  menu: async ({ getConfig, setConfig }) => {
-    // All *Config methods are wrapped Promise<T>
-    const config = await getConfig();
-    return [
-      {
-        label: 'menu',
-        submenu: [1, 2, 3].map((value) => ({
-          label: `value ${value}`,
-          type: 'radio',
-          checked: config.value === value,
-          click() {
-            setConfig({ value });
-          },
-        })),
-      },
-    ];
-  },
-  backend: {
-    start({ window, ipc }) {
-      window.maximize();
-
-      // you can communicate with renderer plugin
-      ipc.handle('some-event', () => {
-        return 'hello';
-      });
-    },
-    // it fired when config changed
-    onConfigChange(newConfig) { /* ... */ },
-    // it fired when plugin disabled
-    stop(context) { /* ... */ },
-  },
-  renderer: {
-    async start(context) {
-      console.log(await context.ipc.invoke('some-event'));
-    },
-    // Only renderer available hook
-    onPlayerApiReady(api, context) {
-      // set plugin config easily
-      context.setConfig({ myConfig: api.getVolume() });
-    },
-    onConfigChange(newConfig) { /* ... */ },
-    stop(_context) { /* ... */ },
-  },
-  preload: {
-    async start({ getConfig }) {
-      const config = await getConfig();
-    },
-    onConfigChange(newConfig) {},
-    stop(_context) {},
-  },
-});
-```
-
-### Common use cases
-
-- injecting custom CSS: create a `style.css` file in the same folder then:
-
-```typescript
-// index.ts
-import style from './style.css?inline'; // import style as inline
-
-import { createPlugin } from '@/utils';
-
-export default createPlugin({
-  name: 'Plugin Label',
-  restartNeeded: true, // if value is true, pear-desktop will show a restart dialog
-  config: {
-    enabled: false,
-  }, // your custom config
-  stylesheets: [style], // your custom style
-  renderer() {} // define renderer hook
-});
-```
-
-- If you want to change the HTML:
-
-```typescript
-import { createPlugin } from '@/utils';
-
-export default createPlugin({
-  name: 'Plugin Label',
-  restartNeeded: true, // if value is true, ytmusic will show the restart dialog
-  config: {
-    enabled: false,
-  }, // your custom config
-  renderer() {
-    console.log('hello from renderer');
-  } // define renderer hook
-});
-```
-
-- communicating between the front and back: can be done using the ipcMain module from electron. See `index.ts` file and
-  example in `sponsorblock` plugin.
-
-## Build
-
-1. Clone the repo
-2. Follow [this guide](https://pnpm.io/installation) to install `pnpm`
-3. Run `pnpm install --frozen-lockfile` to install dependencies
-4. Run `pnpm build:OS`
-
-- `pnpm dist:win` - Windows
-- `pnpm dist:linux` - Linux (amd64)
-- `pnpm dist:linux:deb-arm64` - Linux (arm64 for Debian)
-- `pnpm dist:linux:rpm-arm64` - Linux (arm64 for Fedora)
-- `pnpm dist:mac` - macOS (amd64)
-- `pnpm dist:mac:arm64` - macOS (arm64)
-
-Builds the app for macOS, Linux, and Windows,
-using [electron-builder](https://github.com/electron-userland/electron-builder).
-
-### Building in devcontainer
-
-1. Clone the repo;
-2. Open the folder in VS Code;
-3. Reopen in container when prompted;
-4. Run `pnpm build` as above (choosing the desired target);
-5. Collect the built files from the `dist` folder.
-
-Since devcontainer uses a mount for the workspace, the built files will be available on the host system as well.
-
-## Production Preview
-
-```bash
 pnpm start
+pnpm start:direct-audio-export
 ```
 
-## Tests
+Integrated radio-stack launch goes through the root wrapper:
 
-```bash
-pnpm test
+```powershell
+pnpm start:radio-stack
 ```
 
-Uses [Playwright](https://playwright.dev/) to test the app.
+`pnpm start:radio-stack` starts the bot package launcher, which resolves the Pear root directory, waits for Pear readiness, and then starts the Discord runtime.
 
-## License
+If Pear is already running and you want the bot runtime only, run the app-package command directly:
 
-MIT © [pear-devs](https://github.com/pear-devs/pear-desktop)
+```powershell
+pnpm --dir apps/discord-radio-bot run runtime
+```
 
-## FAQ
+## Slash Commands
 
-### Why apps menu isn't showing up?
+`/radio join`
 
-If `Hide Menu` option is on - you can show the menu with the <kbd>alt</kbd> key (or <kbd>\`</kbd> [backtick] if using
-the in-app-menu plugin)
+- Joins only the configured controller user's current standard guild voice channel.
+- If the bot is already connected elsewhere, it moves the existing voice session to the controller user's current standard voice channel and keeps the relay running.
+- Rejects stage channels.
+- Fails clearly if the controller user is not in voice.
+
+`/radio leave`
+
+- Stops the relay and leaves the current voice connection.
+
+`/radio add query:<text> placement:<queue|next>`
+
+- Searches Pear directly.
+- Drops non-playable results and entries without a usable `videoId` or label.
+- Returns an ephemeral select menu.
+- Enqueues directly in Pear with no bot-side queue or search cache.
+
+`/radio now`
+
+- Reports the current Pear-backed track projection.
+- Distinguishes `offline`, `connecting`, `ready`, and `degraded`.
+
+`/radio control action:<play|pause|toggle|next|previous>`
+
+- Sends the selected control action straight to Pear.
+
+## Command Surface
+
+Root entry points:
+
+```text
+pnpm start:radio-stack
+pnpm doctor:radio-bot
+pnpm test:radio-bot
+pnpm install
+pnpm build
+pnpm dev
+pnpm start
+pnpm start:direct-audio-export
+```
+
+Bot-package-only commands:
+
+```text
+pnpm --dir apps/discord-radio-bot run bootstrap:ffmpeg
+pnpm --dir apps/discord-radio-bot run sync-commands
+pnpm --dir apps/discord-radio-bot run runtime
+pnpm --dir apps/discord-radio-bot run lint
+pnpm --dir apps/discord-radio-bot run typecheck
+pnpm --dir apps/discord-radio-bot run test
+```
+
+## Implementation Notes
+
+- Runtime uses only `Guilds` and `GuildVoiceStates` gateway intents.
+- Runtime command handling is gateway-only; there is no public HTTP interactions endpoint.
+- Audio relay uses Pear direct audio export plus FFmpeg `libopus` / `ogg` encoding for `@discordjs/voice`.
+- The supported Pear patch lives in this repo root; see [docs/private-pear-fork.md](./docs/private-pear-fork.md).
+- The bot/runtime package lives under [apps/discord-radio-bot](./apps/discord-radio-bot).
+- Runtime and `doctor` resolve FFmpeg as app-managed -> `FFMPEG_PATH` -> `PATH`.
+- The pinned FFmpeg manifest and attribution note stay in sync with [docs/ffmpeg-management.md](./docs/ffmpeg-management.md) and [docs/ffmpeg-notice.md](./docs/ffmpeg-notice.md).
+
+Windows soak execution docs:
+
+- [docs/windows-soak-checklist.md](./docs/windows-soak-checklist.md)
+- [docs/windows-soak-results-template.md](./docs/windows-soak-results-template.md)
+
+## Manual Windows Verification
+
+1. Run `pnpm install` and `pnpm build` at the repo root.
+2. Run `pnpm --dir apps/discord-radio-bot run bootstrap:ffmpeg`.
+3. Start Pear from this repo root and confirm the API server is reachable on `127.0.0.1`.
+4. Enable the `Direct Audio Export (Spike)` plugin in the Pear app.
+5. Run `pnpm doctor:radio-bot` and require `full-pass: YES`.
+6. For direct bot-package commands, either export the bot env in the current shell or place a matching `.env` in `apps/discord-radio-bot/`.
+7. Run `pnpm --dir apps/discord-radio-bot run sync-commands`.
+8. Run `pnpm start:radio-stack`.
+9. As the configured controller user, verify `/radio join`, `/radio add`, `/radio now`, `/radio control`, and `/radio leave`.
+
+## Known Limits
+
+- Runtime is intended for native Windows 11 use only.
+- Only one configured guild and one configured controller user are accepted.
+- Only standard guild voice channels are supported.
+- `pnpm start:radio-stack` is the supported integrated startup path.
+- Slash commands are not auto-synced at runtime.
+- Source installs need one-time internet access for the default FFmpeg bootstrap path unless `FFMPEG_PATH` or `PATH` already provides a working binary.

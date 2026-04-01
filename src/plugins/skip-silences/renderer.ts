@@ -14,7 +14,10 @@ const speakingHistory = Array.from({ length: history }).fill(0) as number[];
 
 let playOrSeekHandler: (() => void) | undefined;
 
-const getMaxVolume = (analyser: AnalyserNode, fftBins: Float32Array) => {
+const getMaxVolume = (
+  analyser: AnalyserNode,
+  fftBins: Float32Array<ArrayBuffer>,
+) => {
   let maxVolume = Number.NEGATIVE_INFINITY;
   analyser.getFloatFrequencyData(fftBins);
 
@@ -37,7 +40,7 @@ const audioCanPlayListener = (e: CustomEvent<Compressor>) => {
   const analyser = audioContext.createAnalyser();
   analyser.fftSize = 512;
   analyser.smoothingTimeConstant = smoothing;
-  const fftBins = new Float32Array(analyser.frequencyBinCount);
+  const fftBins = new Float32Array(analyser.frequencyBinCount) as Float32Array<ArrayBuffer>;
 
   sourceNode.connect(analyser);
 

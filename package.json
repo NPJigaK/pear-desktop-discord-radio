@@ -16,9 +16,13 @@
   "scripts": {
     "test": "pnpm playwright test",
     "test:debug": "pnpm cross-env DEBUG=pw:*,-pw:test:protocol playwright test",
+    "test:radio-bot": "node scripts/run-radio-bot.mjs test",
     "build": "pnpm electron-vite build",
+    "doctor:radio-bot": "node scripts/run-radio-bot.mjs doctor",
     "vite:inspect": "pnpm clean && electron-vite build --mode development && pnpm exec serve .vite-inspect",
     "start": "pnpm electron-vite preview",
+    "start:direct-audio-export": "pnpm start",
+    "start:radio-stack": "node scripts/run-radio-bot.mjs launch",
     "start:debug": "pnpm cross-env ELECTRON_ENABLE_LOGGING=1 pnpm start",
     "dev": "pnpm cross-env NODE_ENV=development NODE_OPTIONS=--enable-source-maps electron-vite dev --watch",
     "dev:renderer": "pnpm cross-env NODE_ENV=development NODE_OPTIONS=--enable-source-maps electron-vite dev",

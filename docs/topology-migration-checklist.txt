@@ -1,0 +1,5 @@
+Docs must say:
+- root is the patched Pear fork
+- bot code lives in apps/discord-radio-bot
+- no sibling Pear repo is required anymore
+- root scripts are the integrated entry points

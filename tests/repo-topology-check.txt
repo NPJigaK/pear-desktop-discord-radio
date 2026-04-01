@@ -1,0 +1,2 @@
+Root should contain Pear app files such as web/, assets/, electron.vite.config.mts.
+Bot runtime should no longer live at root src/ and tests/.
